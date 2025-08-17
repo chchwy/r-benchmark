@@ -23,6 +23,12 @@ jobs:
         r-version: ${{ matrix.r-version }}
         use-public-rspm: true
         
+    - name: Setup R package manager (faster binary installs)
+      run: |
+        # Configure repository for faster binary package installs
+        echo 'options(repos = c(CRAN = "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest"))' >> ~/.Rprofile
+        echo 'options(HTTPUserAgent = sprintf("R/%s R (%s)", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os)))' >> ~/.Rprofile
+        
     - name: Install system dependencies
       run: |
         sudo apt-get update
@@ -38,16 +44,30 @@ jobs:
           libjpeg-dev
           
     - name: Cache R packages
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
-        path: ~/R/Library
-        key: ${{ runner.os }}-r${{ matrix.r-version }}-packages-${{ hashFiles('benchmark.R') }}
-        restore-keys: ${{ runner.os }}-r${{ matrix.r-version }}-packages-
+        path: |
+          /home/runner/work/_temp/Library
+          ~/.local/share/renv
+        key: ${{ runner.os }}-r${{ matrix.r-version }}-packages-v2-${{ hashFiles('benchmark.R') }}
+        restore-keys: |
+          ${{ runner.os }}-r${{ matrix.r-version }}-packages-v2-
+          ${{ runner.os }}-r${{ matrix.r-version }}-packages-
         
     - name: Install R dependencies
       run: |
-        # Install required packages
-        Rscript -e "install.packages(c('microbenchmark', 'ggplot2'), repos='https://cran.rstudio.com/', dependencies=TRUE)"
+        # Fast installation using binary packages
+        echo "Installing packages with binary preference..."
+        Rscript -e "
+          options(repos = c(CRAN = 'https://packagemanager.rstudio.com/cran/__linux__/jammy/latest'))
+          # Install only essential packages for the benchmark
+          if (!require('microbenchmark', quietly = TRUE)) {
+            install.packages('microbenchmark', type = 'binary')
+          }
+          # Skip ggplot2 since it's not actually used in the benchmark
+          cat('Successfully installed required packages\n')
+          cat('microbenchmark version:', as.character(packageVersion('microbenchmark')), '\n')
+        "
         
     - name: Display system information
       run: |
@@ -60,8 +80,7 @@ jobs:
         echo "=== R Version ==="
         Rscript -e "cat('R version:', R.version.string, '\n')"
         echo "=== R Package Information ==="
-        Rscript -e "cat('microbenchmark version:', packageVersion('microbenchmark'), '\n')"
-        Rscript -e "cat('ggplot2 version:', packageVersion('ggplot2'), '\n')"
+        Rscript -e "if (require('microbenchmark', quietly=TRUE)) cat('microbenchmark version:', as.character(packageVersion('microbenchmark')), '\n') else cat('microbenchmark not installed\n')"
         
     - name: Run R Array Traversal Benchmark
       run: |
