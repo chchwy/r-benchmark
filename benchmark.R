@@ -69,7 +69,7 @@ for (size_name in names(matrix_sizes)) {
     benchmark_result <- microbenchmark(
       row_major = row_major_traversal(test_matrix),
       column_major = column_major_traversal(test_matrix),
-      times = 30,  # Reduced from 100 for faster CI
+      times = 50,
       unit = "ms"
     )
     
