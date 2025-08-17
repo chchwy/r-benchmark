@@ -56,13 +56,13 @@ jobs:
         
     - name: Install R dependencies
       run: |
-        # Fast installation using binary packages
-        echo "Installing packages with binary preference..."
+        # Fast installation using RStudio Package Manager
+        echo "Installing packages..."
         Rscript -e "
           options(repos = c(CRAN = 'https://packagemanager.rstudio.com/cran/__linux__/jammy/latest'))
           # Install only essential packages for the benchmark
           if (!require('microbenchmark', quietly = TRUE)) {
-            install.packages('microbenchmark', type = 'binary')
+            install.packages('microbenchmark')
           }
           # Skip ggplot2 since it's not actually used in the benchmark
           cat('Successfully installed required packages\n')

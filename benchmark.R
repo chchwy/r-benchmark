@@ -9,15 +9,9 @@ cat("Platform:", Sys.info()["sysname"], Sys.info()["release"], "\n\n")
 # Install and load required packages
 tryCatch({
   if (!require(microbenchmark, quietly = TRUE)) {
-    install.packages("microbenchmark", repos = "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest", type = "binary")
+    install.packages("microbenchmark", repos = "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest")
     library(microbenchmark)
   }
-  
-  # Note: ggplot2 is not actually used in this benchmark, so we skip it for faster CI
-  # if (!require(ggplot2, quietly = TRUE)) {
-  #   install.packages("ggplot2", repos = "https://packagemanager.rstudio.com/cran/__linux__/jammy/latest", type = "binary")
-  #   library(ggplot2)
-  # }
 }, error = function(e) {
   cat("Error installing packages:", e$message, "\n")
   quit(status = 1)
