@@ -47,8 +47,8 @@ cat("=== BENCHMARK: Row Major vs Column Major Traversal ===\n\n")
 # Reduced sizes for CI environment to avoid timeouts
 matrix_sizes <- list(
   small = c(100, 100),
-  medium = c(300, 300),  # Reduced from 500x500
-  large = c(500, 500)    # Reduced from 1000x1000
+  medium = c(1024, 1024),
+  large = c(2048, 2048) 
 )
 
 results_summary <- data.frame()
