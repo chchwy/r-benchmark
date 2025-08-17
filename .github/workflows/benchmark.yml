@@ -2,21 +2,16 @@ name: R Array Traversal Benchmark
 
 on:
   push:
-    branches: [ master, main ]
-  pull_request:
-    branches: [ master, main ]
+    branches: [ master ]
   workflow_dispatch:  # Allow manual triggering
-  schedule:
-    # Run benchmark weekly on Sundays at 06:00 UTC
-    - cron: '0 6 * * 0'
-
+  
 jobs:
   benchmark:
     runs-on: ubuntu-latest
     
     strategy:
       matrix:
-        r-version: ['4.3.0', 'release']  # Test on specific version and latest
+        r-version: ['release']  # Test on specific version and latest
     
     steps:
     - name: Checkout repository
@@ -79,7 +74,7 @@ jobs:
         echo "Exit code: $?"
         
     - name: Upload benchmark artifacts (if any plots are generated)
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: benchmark-results-r${{ matrix.r-version }}
